@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import "./styles.css";
 
-import { loadPosts } from "../../utils/load-posts";
 import { Posts } from "../../components/Posts";
+import { loadPosts } from "../../utils/load-posts";
 import { Button } from "../../components/Button";
 import { TextInput } from "../../components/TextInput";
 
@@ -11,16 +11,18 @@ export const Home = () => {
   const [posts, setPosts] = useState([]);
   const [allPosts, setAllPosts] = useState([]);
   const [page, setPage] = useState(0);
-  const [postsPerPage] = useState(5);
+  const [postsPerPage] = useState(2);
   const [searchValue, setSearchValue] = useState("");
 
   const handleLoadPosts = useCallback(async (page, postsPerPage) => {
     const postsAndPhotos = await loadPosts();
+
     setPosts(postsAndPhotos.slice(page, postsPerPage));
     setAllPosts(postsAndPhotos);
   }, []);
 
   useEffect(() => {
+    // console.log(new Date().toLocaleString('pt-BR'));
     handleLoadPosts(0, postsPerPage);
   }, [handleLoadPosts, postsPerPage]);
 
@@ -28,6 +30,7 @@ export const Home = () => {
     const nextPage = page + postsPerPage;
     const nextPosts = allPosts.slice(nextPage, nextPage + postsPerPage);
     posts.push(...nextPosts);
+
     setPosts(posts);
     setPage(nextPage);
   };
@@ -38,7 +41,7 @@ export const Home = () => {
   };
 
   const noMorePosts = page + postsPerPage >= allPosts.length;
-  const filteredPosts = !!searchValue
+  const filteredPosts = searchValue
     ? allPosts.filter((post) => {
         return post.title.toLowerCase().includes(searchValue.toLowerCase());
       })
@@ -51,6 +54,7 @@ export const Home = () => {
 
         <TextInput searchValue={searchValue} handleChange={handleChange} />
       </div>
+
       {filteredPosts.length > 0 && <Posts posts={filteredPosts} />}
 
       {filteredPosts.length === 0 && <p>Não existem posts =(</p>}
